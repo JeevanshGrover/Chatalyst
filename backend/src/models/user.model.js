@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
     email: {
         type: String,
         required: true,
@@ -25,6 +25,9 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
+    refreshToken: {
+        type: String
+    }
 },
 { timestamps: true });
 
