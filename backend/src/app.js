@@ -19,6 +19,6 @@ import authRouter from './routes/auth.route.js'
 
 
 // declaration of routes
-app.use("/api/auth", authRouter);
+app.use("/api/v1/auth", authRouter);
 
 export { app };
