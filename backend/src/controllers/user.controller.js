@@ -226,11 +226,22 @@ const updateAccountDetails = asyncHandler(async(req, res) => {
     .json(new ApiResponse(200, user, "user updated successfully"))
 })
 
+const checkAuth = (req,res) => {
+    const user = req.user;
+    if(!user){
+        throw new ApiError(401, "unauthorized request");
+    }
+    return res
+    .status(200)
+    .json(new ApiResponse(200, user, "user is authenticated"));
+}
+
 export{
     signup,
     login,
     logout,
     refreshAccessToken,
     ChangePassword,
-    updateAccountDetails
+    updateAccountDetails,
+    checkAuth
 }
