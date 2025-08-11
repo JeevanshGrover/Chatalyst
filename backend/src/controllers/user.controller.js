@@ -23,10 +23,10 @@ const generateAccessAndRefreshToken = async (userId) => {
 }
 
 const signup = async (req, res) => {
-    const { username, email, fullName, password, profilePic } = req.body;
+    const { username, email, password, profilePic } = req.body;
     try {
         if(
-            [fullName, username, email, password].some((field) => field?.trim() === "")
+            [username, email, password].some((field) => field?.trim() === "")
         ){
             return res.status(400).json({message: "all fields are required"});
         }
@@ -39,7 +39,6 @@ const signup = async (req, res) => {
         }
 
         const user = await User.create({
-            fullName,
             username,
             email,
             password,
