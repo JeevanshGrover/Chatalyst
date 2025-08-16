@@ -20,6 +20,6 @@ router.route("/logout").post(verifyJWT, logout);
 router.route("/refresh-Token").post(verifyJWT, refreshAccessToken);
 router.route("/change-password").patch(verifyJWT, ChangePassword);
 router.route("/update-details").patch(verifyJWT, updateAccountDetails);
-router.route("/checkAuth").get(verifyJWT, checkAuth);
+router.route("/checkAuth").get(checkAuth);
 
 export default router;

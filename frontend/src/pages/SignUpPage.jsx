@@ -16,7 +16,7 @@ function SignUpPage() {
   const { signup, isSigningUp } = useAuthStore();
 
   const validateForm = () => {
-    if(!formData.username.trim()) return toast.error("Full Name is required");
+    if(!formData.username.trim()) return toast.error("username is required");
     if(!formData.email.trim()) return toast.error("Email is required");
     if (!/\S+@\S+\.\S+/.test(formData.email)) return toast.error("Invalid email format");
     if (!formData.password) return toast.error("Password is required");
@@ -99,7 +99,7 @@ function SignUpPage() {
                 <input
                   type={showPassword ? "text" : "password"}
                   className={`input input-bordered w-full pl-10`}
-                  placeholder="••••••••"
+                  placeholder="enter your password"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
@@ -140,8 +140,8 @@ function SignUpPage() {
 
         </div>
       </div>
-      {/* right side */}
 
+      {/* right side */}
       <AuthImagePattern
         title="Join our community"
         subtitle="Connect with friends, share moments, and stay in touch with your loved ones."
