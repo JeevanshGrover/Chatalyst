@@ -23,10 +23,10 @@ const generateAccessAndRefreshToken = async (userId) => {
 }
 
 const signup = async (req, res) => {
-    const { username, email, password, profilePic } = req.body;
+    const { username, email, password, profilePic, fullName } = req.body;
     try {
         if(
-            [username, email, password].some((field) => field?.trim() === "")
+            [username, email, password, fullName].some((field) => field?.trim() === "")
         ){
             return res.status(400).json({message: "all fields are required"});
         }
@@ -39,10 +39,11 @@ const signup = async (req, res) => {
         }
 
         const user = await User.create({
+            fullName,
             username,
             email,
             password,
-            profilePic
+            profilePic,
         })
 
         if(!user){
@@ -69,17 +70,15 @@ const signup = async (req, res) => {
 }   
 
 const login = asyncHandler(async (req, res) => {
-    const { username, email, password } = req.body;
-    if(!username || !email){
-        throw new ApiError(400, "username or email is required");
+    const { email, password } = req.body;
+    if(!email){
+        throw new ApiError(400, "email is required");
     }
 
-    const user = await User.findOne({
-        $or: [{username}, {email}]
-    })
+    const user = await User.findOne({ email });
 
     if(!user){
-        throw new ApiError(404, "user nor found");
+        throw new ApiError(404, "user not found");
     }
 
     const isPasswordCorrect = await user.isPasswordCorrect(password);
