@@ -7,7 +7,7 @@ export const useAuthStore = create((set) => ({
     authUser: null,
     isSigningUp: false,
     isLoggingIn: false,
-    isUpdatingProfile: false,
+    isUpdatingProfilePic: false,
 
     isCheckingAuth: true,
 
@@ -63,4 +63,8 @@ export const useAuthStore = create((set) => ({
             toast.error(error.response.data?.message || "Logout failed");
         }
     },
+
+    updateProfilePic: async(data) => {
+
+    }
 }))

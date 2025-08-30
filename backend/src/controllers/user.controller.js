@@ -140,7 +140,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
 
     if(!incomingRefreshToken){
-        throw new ApiError(401, "unauthorized requesr")
+        throw new ApiError(401, "unauthorized request")
     }
 
     //verify the refresh token
@@ -201,18 +201,14 @@ const ChangePassword = asyncHandler(async (req, res) => {
 })
 
 const updateAccountDetails = asyncHandler(async(req, res) => {
-    const {fullName, email} = req.body
-
-    if(!(fullName && email)){
-        throw new ApiError(400, "all fields are required")
-    }
+    const {fullName, email} = req.body;
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
             $set: {
-                fullName,
-                email
+                fullName: fullName? fullName : req.user.fullName,
+                email: email? email : req.user.email
             }
         },
 
@@ -234,6 +230,34 @@ const checkAuth = (req,res) => {
     .json(new ApiResponse(200, user, "user is authenticated"));
 }
 
+const updateProfilePic = asyncHandler(async(req, res) => {
+    const { profilePic } = req.body;
+    const userId = req.user?._id; 
+
+    if(!profilePic){
+        throw new ApiError(400, "profile picture is required");
+    }
+
+    const updatedPic = await User.findByIdAndUpdate(
+        userId,
+        {
+            $set: {
+                profilePic: {
+                    url: profilePic.secure_url,
+                    publicId: profilePic.public_id
+                }
+            }
+        },
+        {new: true}
+    )
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, updatedPic, "profile picture updated successfully")
+    )
+})
+
 export{
     signup,
     login,
@@ -241,5 +265,6 @@ export{
     refreshAccessToken,
     ChangePassword,
     updateAccountDetails,
-    checkAuth
+    checkAuth,
+    updateProfilePic
 }
