@@ -25,8 +25,8 @@ const userSchema = new Schema({
         minLength: 6,
     },
     profilePic: {
-        type: String,
-        default: ""
+        type: Object,
+        default: {}
     },
     refreshToken: {
         type: String

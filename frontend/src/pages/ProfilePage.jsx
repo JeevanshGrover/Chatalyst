@@ -1,10 +1,23 @@
+import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore.js"
+import { Camera, Mail, User } from "lucide-react";
+import { uploadToCloudinary } from "../utils/cloudinary.js";
 
 const ProfilePage = () => {
   const { authUser, isUpdatingProfilePic, updateProfilePic } = useAuthStore();
+  const [selectedImg, setSelectedImg] = useState(null);
 
-  handleImageUpload = async(e) => {
+  const handleImageUpload = async(e) => {
+    const file = e.target.files[0];
+    if(!file) return;
 
+    try {
+      const cloudinaryRes = await uploadToCloudinary(file);
+      setSelectedImg(cloudinaryRes.secure_url);
+      await updateProfilePic({ profilePic: cloudinaryRes });
+    } catch (error) {
+      console.log("Error uploading the image", error);
+    }
   } 
   
   return (
@@ -21,7 +34,7 @@ const ProfilePage = () => {
           <div className="flex flex-col items-center gap-4">
             <div className="relative">
               <img
-                src={selectedImg || authUser.profilePic || "/avatar.png"}
+                src={selectedImg || authUser.profilePic?.url || "/avatar.png"}
                 alt="Profile"
                 className="size-32 rounded-full object-cover border-4 "
               />
@@ -47,7 +60,7 @@ const ProfilePage = () => {
               </label>
             </div>
             <p className="text-sm text-zinc-400">
-              {isUpdatingProfile ? "Uploading..." : "Click the camera icon to update your photo"}
+              {isUpdatingProfilePic ? "Uploading..." : "Click the camera icon to update your photo"}
             </p>
           </div>
 

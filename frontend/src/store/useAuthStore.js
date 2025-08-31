@@ -1,7 +1,6 @@
 import {create} from 'zustand';
-import axios from 'axios';
+import { axiosInstance as axios } from '../lib/axios.js';
 import toast from 'react-hot-toast';
-
 
 export const useAuthStore = create((set) => ({
     authUser: null,
@@ -13,9 +12,9 @@ export const useAuthStore = create((set) => ({
 
     checkAuth: async () => {
         try {
-            const res = await axios.get("/api/v1/auth/checkAuth");
+            const res = await axios.get("/auth/checkAuth");
             set({
-                authUser: res.data
+                authUser: res.data.data
             });
         } catch (error) {
             console.log("error in checkAuth:", error);
@@ -30,9 +29,9 @@ export const useAuthStore = create((set) => ({
             if(!data){
                 console.log("No data provided for signup");
             }
-            const res = await axios.post("/api/v1/auth/signup", data);
+            const res = await axios.post("/auth/signup", data);
             
-            set({ authUser: res.data });
+            set({ authUser: res.data.data });
             toast.success("Account created successfully");
         } catch (error) {
             toast.error(error.response?.data?.message || "Signup failed");
@@ -44,8 +43,8 @@ export const useAuthStore = create((set) => ({
     login: async(data) => {
         set({ isLoggingIn: true });
         try {
-            const res = await axios.post("/api/v1/auth/login", data);
-            set({ authUser: res.data });
+            const res = await axios.post("/auth/login", data);
+            set({ authUser: res.data.data });
             toast.success("Logged in successfully");
         } catch(error){
             toast.error(error.response?.data?.message || "Login failed");
@@ -56,7 +55,7 @@ export const useAuthStore = create((set) => ({
     
     logout: async () => {
         try {
-            await axios.post("/api/v1/auth/logout");
+            await axios.post("/auth/logout");
             set({ authUser: null });
             toast.success("Logged out successfully")
         } catch (error) {
@@ -65,6 +64,16 @@ export const useAuthStore = create((set) => ({
     },
 
     updateProfilePic: async(data) => {
-
+        set({ isUpdatingProfilePic: true });
+        try {
+            const res = await axios.patch("/auth/updateProfilePic", data);
+            set({ authUser: res.data.data });
+            toast.success("Profile picture updated");
+        } catch (error) {
+            console.log("error in updateProfilePic:", error);
+            toast.error(error.response?.data?.message|| "error uploading the picture")
+        } finally {
+            set({ isUpdatingProfilePic: false });
+        }
     }
 }))

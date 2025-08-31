@@ -6,7 +6,8 @@ import {
     signup,
     ChangePassword,
     updateAccountDetails,
-    checkAuth
+    checkAuth,
+    updateProfilePic
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 
@@ -20,6 +21,7 @@ router.route("/logout").post(verifyJWT, logout);
 router.route("/refresh-Token").post(verifyJWT, refreshAccessToken);
 router.route("/change-password").patch(verifyJWT, ChangePassword);
 router.route("/update-details").patch(verifyJWT, updateAccountDetails);
-router.route("/checkAuth").get(checkAuth);
+router.route("/checkAuth").get(verifyJWT, checkAuth); 
+router.route("/updateProfilePic").patch(verifyJWT, updateProfilePic);
 
 export default router;

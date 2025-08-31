@@ -88,11 +88,12 @@ const login = asyncHandler(async (req, res) => {
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
 
-    const loggedInUser = await User.findById(user._id).select("-password, -refreshToken");
+    const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
 
     const options = {
         httpOnly: true,
-        secure: true
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict"
     }
 
     return res
@@ -124,7 +125,8 @@ const logout = asyncHandler(async (req, res)=> {
 
     const options = {
         httpOnly: true,
-        secure: true
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict"
     }
 
     return res
@@ -158,10 +160,11 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
         const options = {
             httpOnly: true,
-            secure: true
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict"
         }
 
-        const { accessToken, newRefreshToken } = await generateAccessAndRefreshToken(user._id)
+        const { accessToken, refreshToken: newRefreshToken } = await generateAccessAndRefreshToken(user._id)
 
         return res
         .status(200)
@@ -213,7 +216,7 @@ const updateAccountDetails = asyncHandler(async(req, res) => {
         },
 
         {new: true} // this is used to return the updated user object
-    ).select("-password, -refreshToken")
+    ).select("-password -refreshToken")
 
     return res
     .status(200)
@@ -238,7 +241,7 @@ const updateProfilePic = asyncHandler(async(req, res) => {
         throw new ApiError(400, "profile picture is required");
     }
 
-    const updatedPic = await User.findByIdAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
         userId,
         {
             $set: {
@@ -254,7 +257,7 @@ const updateProfilePic = asyncHandler(async(req, res) => {
     return res
     .status(200)
     .json(
-        new ApiResponse(200, updatedPic, "profile picture updated successfully")
+        new ApiResponse(200, updatedUser, "profile picture updated successfully")
     )
 })
 
