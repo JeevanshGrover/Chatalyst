@@ -1,5 +1,5 @@
 import express from 'express';
-import { verifyJwt } from '../middleware/auth.middleware.js'
+import { verifyJWT } from '../middleware/auth.middleware.js'
 import {
     getMessages,
     getUsersForSidebar,
@@ -8,9 +8,10 @@ import {
 
 const router = express.Router();
 
-router.use(verifyJwt); 
+router.use(verifyJWT); 
 
 router.route("/users").get(getUsersForSidebar);
-router.route
+router.route("/:id").get(getMessages);
+router.route("/:id").post(sendMessage);
 
 export default router;

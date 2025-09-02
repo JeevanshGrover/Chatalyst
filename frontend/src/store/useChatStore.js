@@ -13,9 +13,9 @@ const useChatStore = create((set) => ({
         set({ isUsersLoading: true });
         try {
             const res = await axios.get('/message/users');
-            set({ users: res.data.data });
+            set({ users: res.data.data.users });
         } catch (error) {
-            toast.error(error?.response?.data?.message || "unable to detch users")
+            toast.error(error?.response?.data?.message || "unable to fetch users")
         } finally {
             set({ isUsersLoading: false });
         }
@@ -27,9 +27,13 @@ const useChatStore = create((set) => ({
             const res = await axios.get(`/message/${userId}`);
             set({ messages: res.data.data })
         } catch (error) {
-            
+            toast.error(error?.response?.data?.message || "unable to fetch messages")
+        } finally {
+            set({ setMessagesLoading: false });
         }
-    }
+    },
+
+    setSelectedUser: (selectedUser) => set({ selectedUser })
 }))
 
 
