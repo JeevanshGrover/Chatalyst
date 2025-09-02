@@ -10,16 +10,17 @@ import { useEffect } from 'react';
 import {Loader} from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast'
+import { useThemeStore } from './store/useThemeStore.js';
 
 const App = ()=>{
   const { authUser, checkAuth, isCheckingAuth} = useAuthStore()
-
+  const {theme} = useThemeStore();
   useEffect(() => {
     checkAuth();
   },[checkAuth]);
 
   console.log({authUser});
-
+  
   if(isCheckingAuth && !authUser) {
     return (
       <div className = "flex items-center justify-center h-screen">
@@ -29,7 +30,7 @@ const App = ()=>{
   }
 
   return (
-    <div >
+    <div data-theme = {theme}>
       <Navbar />
       <Routes>
         <Route path="/" element = {authUser? <HomePage />: <Navigate to="/login"/> } />
