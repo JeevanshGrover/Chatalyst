@@ -12,7 +12,7 @@ const getUsersForSidebar = asyncHandler(async(req, res) => {
     const aggregate = User.aggregate([
         {
             $match: {
-                _id: { $ne: new mongoose.Types.ObjectId(loggedInUserId) }
+                _id: { $ne: new mongoose.Types.ObjectId(loggedInUserId) } 
             }
         },
         {
@@ -88,7 +88,27 @@ const getMessages = asyncHandler(async (req, res) => {
 })
 
 const sendMessage = asyncHandler(async (req, res) => {
-    const {text, image} = req.body;
+    const {text, mediaFile} = req.body;
+    const { id: receiverId } = req.params;
+    const senderId = req.user._id;
+
+    if(!text && !mediaFile){
+        throw new ApiError(400, "cannot send empty message");
+    }
+
+    const newMessage = await new Message.create({
+        senderId: senderId,
+        receiver: receiverId,
+        text: text? text : "",
+        mediaFile: mediaFile ? {
+            url: mediaFile.secure_url,
+            publicId: mediaFile.public_id
+        } : null 
+    })
+
+    return res
+    .status(201)
+    .json(new ApiResponse(201, newMessage, "message sent successfully"));
 })
 
 export{

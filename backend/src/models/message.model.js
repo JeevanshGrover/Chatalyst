@@ -15,8 +15,8 @@ const messageSchema = new Schema(
         text: {
             type: String
         },
-        image: {
-            type: String
+        mediaFile: {
+            type: Object
         }
     },
     {timestamps: true}
