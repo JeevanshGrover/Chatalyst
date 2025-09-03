@@ -76,9 +76,9 @@ const getMessages = asyncHandler(async (req, res) => {
     
         const messages = await Message.aggregatePaginate(aggregateQuery, options);
     
-        if (!messages || messages.docs.length === 0) {
-            throw new ApiError(404, "No messages found");
-        }
+        // if (!messages || messages.docs.length === 0) {
+        //     throw new ApiError(404, "No messages found");
+        // }
     
         return res
         .status(200)
@@ -97,8 +97,8 @@ const sendMessage = asyncHandler(async (req, res) => {
         throw new ApiError(400, "cannot send empty message");
     }
 
-    const newMessage = await new Message.create({
-        senderId: senderId,
+    const newMessage = new Message({
+        sender: senderId,
         receiver: receiverId,
         text: text? text : "",
         mediaFile: mediaFile ? {
@@ -106,6 +106,8 @@ const sendMessage = asyncHandler(async (req, res) => {
             publicId: mediaFile.public_id
         } : null 
     })
+
+    await newMessage.save();
 
     return res
     .status(201)

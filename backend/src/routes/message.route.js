@@ -12,6 +12,6 @@ router.use(verifyJWT);
 
 router.route("/users").get(getUsersForSidebar);
 router.route("/:id").get(getMessages);
-router.route("/:id").post(sendMessage);
+router.route("/send/:id").post(sendMessage);
 
 export default router;
