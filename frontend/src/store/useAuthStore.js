@@ -3,7 +3,7 @@ import { axiosInstance as axios } from '../lib/axios.js';
 import toast from 'react-hot-toast';
 import { io } from "socket.io-client"
 
-const BASE_URL = "http://localhost:8080"
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export const useAuthStore = create((set, get) => ({
     authUser: null,
@@ -66,6 +66,7 @@ export const useAuthStore = create((set, get) => ({
             set({ authUser: null });
             toast.success("Logged out successfully")
             get().disconnectSocket();
+            console.log("user disconnected")
         } catch (error) {
             toast.error(error.response.data?.message || "Logout failed");
         }
@@ -89,9 +90,20 @@ export const useAuthStore = create((set, get) => ({
         const { authUser } = get();
         if(!authUser || get().socket?.connected) return;
 
-        const socket = io(BASE_URL)
+        const socket = io(BASE_URL, {
+            query: {
+                userId: authUser._id
+            }
+        })
         socket.connect();
+        set({ socket: socket }); 
+
+        socket.on("getOnlineUsers", (userIds) => {
+            set({ onlineUsers: userIds})
+        })
     },
 
-    disconnectSocket: () => {}
+    disconnectSocket: () => {
+        if(get().socket?.connected) get().socket.disconnect();
+    }
 }))

@@ -11,11 +11,29 @@ const io = new Server(server, {
     }
 })
 
+
+//used to store the online users
+const userSocketMap = {};
+
+export function getReceiverSocketId(userId){
+    return userSocketMap[userId];
+}
+
 io.on("connection", (socket) => {
     console.log("a user connected", socket.id);
 
-    socket.on("disconnected", () => {
+    const userId = socket.handshake.query.userId;
+    if(userId){
+        userSocketMap[userId] = socket.id;
+    }
+
+    // this will broadcast the online users to all the connected clients
+    io.emit("getOnlineUsers", Object.keys(userSocketMap));
+
+    socket.on("disconnect", () => {
         console.log("a user disconnected", socket.id);
+        delete userSocketMap[userId];
+        io.emit("getOnlineUsers", Object.keys(userSocketMap));
     })
 })
 

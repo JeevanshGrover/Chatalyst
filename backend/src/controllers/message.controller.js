@@ -4,6 +4,7 @@ import { ApiError } from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import mongoose from "mongoose";
+import { getReceiverSocketId, io } from "../db/socket.js";
 
 const getUsersForSidebar = asyncHandler(async(req, res) => {
     const loggedInUserId = req.user._id;
@@ -108,6 +109,11 @@ const sendMessage = asyncHandler(async (req, res) => {
     })
 
     await newMessage.save();
+
+    const receiverSocketId = getReceiverSocketId(receiverId)
+    if(receiverSocketId){
+        io.to(receiverSocketId).emit("newMessage", newMessage)
+    }
 
     return res
     .status(201)
