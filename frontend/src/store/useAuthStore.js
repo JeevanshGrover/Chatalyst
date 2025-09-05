@@ -1,4 +1,4 @@
-import {create} from 'zustand';
+import { create } from 'zustand';
 import { axiosInstance as axios } from '../lib/axios.js';
 import toast from 'react-hot-toast';
 import { io } from "socket.io-client"
@@ -22,8 +22,8 @@ export const useAuthStore = create((set, get) => ({
             });
             get().connectSocket();
         } catch (error) {
-            console.log("error in checkAuth:", error);
-            set({ authUser: null})
+            // console.log("error in checkAuth:", error);
+            set({ authUser: null })
         } finally {
             set({ isCheckingAuth: false });
         }
@@ -31,11 +31,11 @@ export const useAuthStore = create((set, get) => ({
 
     signup: async (data) => {
         try {
-            if(!data){
+            if (!data) {
                 console.log("No data provided for signup");
             }
             const res = await axios.post("/auth/signup", data);
-            
+
             set({ authUser: res.data.data });
             toast.success("Account created successfully");
         } catch (error) {
@@ -45,65 +45,67 @@ export const useAuthStore = create((set, get) => ({
         }
     },
 
-    login: async(data) => {
+    login: async (data) => {
         set({ isLoggingIn: true });
         try {
             const res = await axios.post("/auth/login", data);
-            set({ authUser: res.data.data });
-            toast.success("Logged in successfully");
-
+            const user = res.data.data;
+            set({ authUser: user });
+            
             get().connectSocket();
-        } catch(error){
+            get().checkAuth();
+            
+            toast.success("Logged in successfully");
+        } catch (error) {
             toast.error(error.response?.data?.message || "Login failed");
         } finally {
             set({ isLoggingIn: false });
         }
     },
-    
+
     logout: async () => {
         try {
             await axios.post("/auth/logout");
-            set({ authUser: null });
-            toast.success("Logged out successfully")
             get().disconnectSocket();
-            console.log("user disconnected")
+            set({ authUser: null, onlineUsers: [] });
+            toast.success("Logged out successfully");
         } catch (error) {
-            toast.error(error.response.data?.message || "Logout failed");
+            toast.error(error.response?.data?.message || "Logout failed");
         }
     },
 
-    updateProfilePic: async(data) => {
+
+    updateProfilePic: async (data) => {
         set({ isUpdatingProfilePic: true });
         try {
             const res = await axios.patch("/auth/updateProfilePic", data);
             set({ authUser: res.data.data });
             toast.success("Profile picture updated");
         } catch (error) {
-            console.log("error in updateProfilePic:", error);
-            toast.error(error.response?.data?.message|| "error uploading the picture")
+            // console.log("error in updateProfilePic:", error);
+            toast.error(error.response?.data?.message || "error uploading the picture")
         } finally {
             set({ isUpdatingProfilePic: false });
         }
     },
 
     connectSocket: () => {
-        const { authUser } = get();
-        if(!authUser || get().socket?.connected) return;
+        const { authUser, socket } = get();
+        if (!authUser?._id || socket?.connected) return;
 
-        const socket = io(BASE_URL, {
-            query: {
-                userId: authUser._id
-            }
-        })
-        socket.connect();
-        set({ socket: socket }); 
+        const newSocket = io(BASE_URL, {
+            query: { userId: authUser._id },
+            transports: ["websocket"],
+        });
 
-        socket.on("getOnlineUsers", (userIds) => {
-            set({ onlineUsers: userIds})
-        })
+        newSocket.on("getOnlineUsers", (userIds) => {
+            set({ onlineUsers: userIds.filter(Boolean) });
+        });
+
+        set({ socket: newSocket });
     },
 
     disconnectSocket: () => {
-        if(get().socket?.connected) get().socket.disconnect();
+        if (get().socket?.connected) get().socket.disconnect();
     }
 }))

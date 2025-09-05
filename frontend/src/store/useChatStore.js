@@ -62,6 +62,7 @@ const useChatStore = create((set, get) => ({
         if(!selectedUser) return;
 
         const socket = useAuthStore.getState().socket;
+        if(!socket || !socket.connected) return;
 
         socket.on("newMessage", (newMessage) => {
             if(newMessage.sender !== selectedUser._id) return;

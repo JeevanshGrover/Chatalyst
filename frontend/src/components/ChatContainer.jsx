@@ -12,11 +12,13 @@ const ChatContainer = () => {
   const messageEndRef = useRef(null);
 
   useEffect(() => {
+    if(!authUser || !selectedUser) return;
+
     getMessages(selectedUser?._id)
     subscribeToMessages()
 
     return () => unsubscribeFromMessages()
-  },[selectedUser._id, getMessages, subscribeToMessages, unsubscribeFromMessages])
+  },[authUser?._id, selectedUser?._id, getMessages, subscribeToMessages, unsubscribeFromMessages])
 
   useEffect(() => {
     if(messageEndRef.current && messages){
@@ -40,7 +42,7 @@ const ChatContainer = () => {
       <ChatHeader />
 
       <div className="flex-1 flex flex-col overflow-auto p-4 space-y-4">
-        {messages?.map((message) => (
+        {authUser && messages?.map((message) => (
           <div
             key = {message._id}
             className = {`chat ${message.sender === authUser._id ? "chat-end" : "chat-start"}`}

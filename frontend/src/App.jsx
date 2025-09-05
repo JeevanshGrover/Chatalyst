@@ -16,12 +16,18 @@ const App = ()=>{
   const { authUser, checkAuth, isCheckingAuth, onlineUsers, connectSocket } = useAuthStore();
   const {theme} = useThemeStore();
 
-  console.log({ onlineUsers })
+  // console.log({ onlineUsers })
   useEffect(() => {
     checkAuth();
   },[checkAuth]);
 
-  console.log({authUser});
+  useEffect(() => {
+    if(authUser?._id){
+      connectSocket();
+    }
+  }, [authUser?._id, connectSocket])
+
+  // console.log({authUser});
   
   if(isCheckingAuth && !authUser) {
     return (
