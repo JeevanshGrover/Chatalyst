@@ -13,10 +13,20 @@ const ProfilePage = () => {
 
     try {
       const cloudinaryRes = await uploadToCloudinary(file);
+      
+      // Validate response
+      if (!cloudinaryRes.secure_url || !cloudinaryRes.public_id) {
+        throw new Error("Invalid Cloudinary response - missing secure_url or public_id");
+      }
+
+      // Verify the URL is accessible before storing
+      console.log("Attempting to access image at:", cloudinaryRes.secure_url);
+      
       setSelectedImg(cloudinaryRes.secure_url);
       await updateProfilePic({ profilePic: cloudinaryRes });
     } catch (error) {
-      console.log("Error uploading the image", error);
+      console.error("Error uploading the image:", error);
+      console.error("Full error details:", error.response || error.message);
     }
   } 
   

@@ -43,7 +43,10 @@ const signup = async (req, res) => {
             username,
             email,
             password,
-            profilePic,
+            profilePic: profilePic ? {
+                url: profilePic.secure_url,
+                publicId: profilePic.public_id
+            } : {},
         })
 
         if(!user){
@@ -246,8 +249,8 @@ const updateProfilePic = asyncHandler(async(req, res) => {
         {
             $set: {
                 profilePic: {
-                    url: profilePic.secure_url,
-                    publicId: profilePic.public_id
+                    url: profilePic.url || profilePic.secure_url,
+                    publicId: profilePic.publicId || profilePic.public_id
                 }
             }
         },

@@ -8,7 +8,6 @@ import { getReceiverSocketId, io } from "../db/socket.js";
 
 const getUsersForSidebar = asyncHandler(async(req, res) => {
     const loggedInUserId = req.user._id;
-    // const filteredUsers = await User.find({_id: { $ne: loggedInUserId } }).select("-password -refreshToken");
     const { page = 1, limit = 10 } = req.query;
     
     const aggregate = User.aggregate([
